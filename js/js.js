@@ -664,10 +664,27 @@ axios.get("/api/statistics/PunishDateAndTimes")
         var max = -1;
         for (var i = 0; i < dataKeys.length; ++i) {
             max = data[dataKeys[i]] > max ? data[dataKeys[i]] : max;
-            option.series[i].name = dataKeys[i];
-            option.series[i].clockWise = true;
-            option.series[i].data[0].value = data[dataKeys[i]];
-            option.series[i].data[1].value = max - data[dataKeys[i]];
+            option.series.push({
+                name: dataKeys[i],
+                type: 'pie',
+                hoverAnimation: false,
+                center: ['50%', '42%'],
+                radius: ['20%', '30%'],
+                itemStyle: dataStyle,
+                clockWise: true,
+                data: [
+                    {
+                        value: data[dataKeys[i]],
+                        name: i.toString(),
+                    },
+                    {
+                        value: max - data[dataKeys[i]],
+                        name: 'invisible',
+                        tooltip: {show: false},
+                        itemStyle: placeHolderStyle,
+                    }
+                ],
+            });
             option.legend.data.push(dataKeys[i]);
         }
         // console.log(option);
