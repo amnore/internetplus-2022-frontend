@@ -103,7 +103,7 @@ axios.get("/api/statistics/PunishedPartyAndMoney")
         var myChart = echarts.init(document.getElementById('echart1'));
         var data = response.data.data.doubleStatistics;
         var dataKeys = Object.keys(data);
-        for (var i = 1; i < 8; ++i) {
+        for (var i = 0; i < dataKeys.length; ++i) {
             option.series[0].data.push(data[dataKeys[i]])
             option.xAxis[0].data.push(dataKeys[i])
         }
@@ -212,7 +212,7 @@ function echarts_2() {
             .then(response => {
                 var data = response.data.data.integerStatistics;
                 var dataKeys = Object.keys(data);
-                for (var i = 0; i < 7; ++i) {
+                for (var i = 0; i < dataKeys.length; ++i) {
                     option.series[0].data.push(data[dataKeys[i]])
                     option.xAxis[0].data.push(dataKeys[i])
                 }
@@ -322,7 +322,7 @@ axios.get("/api/statistics/PunisherNameAndTimes")
     .then(response => {
         var data = response.data.data.integerStatistics;
         var dataKeys = Object.keys(data);
-        for (var i = 2; i < 9; ++i) {
+        for (var i = 0; i < dataKeys.length; ++i) {
             option.series[0].data.push(data[dataKeys[i]])
             option.xAxis[0].data.push(dataKeys[i])
         }
@@ -503,7 +503,7 @@ axios.get("/api/statistics/YearAndAverageMoney")
     .then(response => {
         var data = response.data.data.doubleStatistics;
         var dataKeys = Object.keys(data);
-        for (var i = 1; i < dataKeys.length; ++i) {
+        for (var i = 0; i < dataKeys.length; ++i) {
             option.series[0].data.push(data[dataKeys[i]])
             option.xAxis[0].data.push(dataKeys[i])
         }
@@ -662,7 +662,7 @@ axios.get("/api/statistics/PunishDateAndTimes")
         var data = response.data.data.integerStatistics;
         var dataKeys = Object.keys(data);
         var max = -1;
-        for (var i = 0; i < 5; ++i) {
+        for (var i = 0; i < dataKeys.length; ++i) {
             max = data[dataKeys[i]] > max ? data[dataKeys[i]] : max;
             option.series[i].name = dataKeys[i];
             option.series[i].clockWise = true;
