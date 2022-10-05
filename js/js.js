@@ -1,5 +1,6 @@
 ﻿
 $(function () {
+    titleContent();
 echarts_1();
 echarts_2();
 echarts_4();
@@ -10,6 +11,26 @@ echarts_5();
 echarts_6();
 echarts_7();
 echarts_8();
+
+//显示totalCases和totalMoney
+function titleContent(){
+
+    axios.get("/api/statistics/Overall")
+        .then(response => {
+            console.log(response)
+            var totalCases = document.getElementById('totalCases');
+            var totalMoney = document.getElementById('totalMoney');
+            var data = response.data.data.integerStatistics;
+            console.log(data)
+            var dataKeys = Object.keys(data);
+            console.log(dataKeys)
+            totalCases.innerText=data[dataKeys[0]];
+            totalMoney.innerText=data[dataKeys[1]];
+            window.addEventListener("resize",function(){
+                title.resize();
+            });
+        })
+}
 
 //按年份统计处罚次数
 function echarts_7(){
