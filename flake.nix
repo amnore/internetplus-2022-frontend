@@ -5,7 +5,7 @@
   in
   {
     devShell.x86_64-linux = with pkgs; mkShell {
-      packages = [ nodejs ];
+      packages = [ nodejs nodePackages.prettier ];
     };
   };
 }

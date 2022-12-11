@@ -1,0 +1,228 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<title>Query</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="js/vue.global.js"></script>
+
+<header>
+    <button><a href="index.html">智能座舱</a></button>
+    <h1>人民银行处罚案例 —— 内规匹配</h1>
+</header>
+
+<div id="app">
+    <div class="boxall">
+        <div class="table-container" @scroll="handleMatchScroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>处罚编号</th>
+                        <th>被处罚实体</th>
+                        <th>违规行为</th>
+                        <!-- <th>处罚决定</th> -->
+                        <!-- <th>处罚机关</th> -->
+                        <th>处罚时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="p in punishments" @click="matchRules(p.mainIllegalFact)">
+                        <td>{{ p.punishmentDocNo }}</td>
+                        <td>{{ p.punishedPartyName }}</td>
+                        <td>{{ p.mainIllegalFact }}</td>
+                        <!-- <td>{{ p.punishmentDecision }}</td> -->
+                        <!-- <td>{{ p.punisherName }}</td> -->
+                        <td>{{ p.punishDate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="match" class="boxall hidden" ref="match">
+        <aside>
+            <h2>匹配结果</h2>
+            <ul>
+                <li v-for="r in matchResults"
+                    :title="r.department + ' ' + r.regulation + ' ' + r.chapter + ' ' + r.article">
+                    {{ r.text }}
+                </li>
+            </ul>
+        </aside>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue
+    const fetchResult = function (path, o) {
+        return fetch(path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(o)
+        }).then(r => r.json()).then(r => Promise.resolve(r.data))
+    }
+
+    createApp({
+        data() {
+            return {
+                punishments: [],
+                punishmentsOffset: 0,
+                matchResults: []
+            }
+        },
+        methods: {
+            getPunishments() {
+                this.punishments = []
+                this.punishmentsOffset = 0
+                this.getMorePunishments()
+            },
+            getMorePunishments() {
+                fetchResult('/api/bankpunishment/query', {
+                    limit: 20,
+                    offset: this.punishmentsOffset
+                }).then(r => {
+                    this.punishments.push(...r.resList)
+                    this.punishmentsOffset += 20
+                })
+            },
+            matchRules(text) {
+                fetchResult('/api/case/similar-articles', {
+                    text,
+                    resultCount: 10,
+                }).then(r => {
+                    this.matchResults = r
+                    this.$refs.match.classList.remove('hidden')
+                })
+            },
+            handleMatchScroll(ev) {
+                const elem = ev.target
+                if (elem.scrollHeight - elem.scrollTop === elem.clientHeight) {
+                    this.getMorePunishments()
+                }
+            }
+        },
+        mounted() {
+            this.getPunishments()
+        }
+    }).mount('#app')
+</script>
+
+<style>
+    body {
+        color: white;
+        font-family: sans-serif;
+        background: #000d4a url(/images/bg.jpg) center top;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    header {
+        height: 5em;
+        background: url(../images/head_bg.png) no-repeat center center;
+        background-size: 100% 100%;
+        margin: none;
+        box-sizing: border-box;
+    }
+
+    header button {
+        top: 1em;
+        left: 1em;
+        position: absolute;
+        display: block;
+        font-size: large;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    header button a {
+        text-decoration: none;
+        color: white;
+    }
+
+    header button:hover {
+        border: 1px solid #399bff;
+    }
+
+    header h1 {
+        margin-top: 0.3em;
+        text-align: center;
+    }
+
+    #app {
+        padding: 10px;
+        border: none;
+        height: calc(100vh - 5em - 10px);
+        width: 100vw;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        box-sizing: border-box;
+    }
+
+    .table-container {
+        overflow: scroll;
+        height: 100%;
+        width: 100%;
+    }
+
+    #match {
+        max-width: 30%;
+    }
+
+    aside {
+        overflow: scroll;
+        height: 100%;
+        width: 100%;
+    }
+
+    aside h2 {
+        margin-bottom: 1em;
+        text-align: center;
+    }
+
+    aside li {
+        margin-top: 1em;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .boxall {
+        border: 1px solid rgba(25, 186, 139, 0.17);
+        padding: 0 0.2rem 0.4rem 0.15rem;
+        background: rgba(255, 255, 255, 0.04) url(../images/line.png);
+        background-size: 100% auto;
+        position: relative;
+        margin-bottom: 0.15rem;
+        z-index: 10;
+    }
+
+    .boxall:before,
+    .boxall:after {
+        position: absolute;
+        width: 0.5rem;
+        height: 0.5rem;
+        content: "";
+        border-top: 2px solid #02a6b5;
+        top: 0;
+    }
+
+    .boxall:before {
+        border-left: 2px solid #02a6b5;
+        left: 0;
+    }
+
+    .boxall:after {
+        border-right: 2px solid #02a6b5;
+        right: 0;
+    }
+</style>
+
+</html>

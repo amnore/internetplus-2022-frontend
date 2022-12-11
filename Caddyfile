@@ -1,0 +1,10 @@
+:8080 {
+  log {
+    level INFO
+  }
+
+  root * .
+
+  reverse_proxy /api/* localhost:8081
+  file_server
+}
